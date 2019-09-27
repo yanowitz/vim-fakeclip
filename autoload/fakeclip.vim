@@ -161,6 +161,10 @@ function! s:read_clipboard()  "{{{2
 endfunction
 
 
+function! s:read_clipboard_linux()
+  return ''
+endfunction
+
 function! s:read_clipboard_mac()
   return system('pbpaste')
 endfunction
@@ -254,6 +258,11 @@ function! s:write_clipboard_mac(text)
 endfunction
 
 
+function! s:write_clipboard_linux(text)
+  call system('yank.sh', a:text)
+  return
+endfunction
+
 function! s:write_clipboard_wsl(text)
   let text = substitute(a:text, "\n", "\r\n", 'g')
   call system('clip.exe', text)
@@ -304,6 +313,9 @@ endfunction
 
 
 function! s:write_pastebuffer_tmux(lines)
+  if executable('yank.sh')
+    call system('yank.sh', a:text)
+  endif
   let _ = tempname()
   call writefile(a:lines, _, 'b')
   call system('tmux load-buffer ' . shellescape(_))
